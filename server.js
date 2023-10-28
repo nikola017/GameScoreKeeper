@@ -7,7 +7,6 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
 
 // za deploy
 const externalUrl = process.env.RENDER_EXTERNAL_URL;
@@ -105,11 +104,6 @@ app.get('/competitions', async (req, res) => {
 });
 
 
-app.listen(port, () => {
-  console.log(`Server pokrenut na http://localhost:${port}`);
-});
-
-/*
 if (externalUrl) {
     const hostname = '0.0.0.0';
     app.listen(port, hostname, () => {
@@ -119,4 +113,4 @@ if (externalUrl) {
     app.listen(port, () => {
         console.log(`Server pokrenut na http://localhost:${port}`);
     });
-  }*/
+  }
