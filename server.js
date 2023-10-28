@@ -103,7 +103,8 @@ app.get('/callback', (req, res) => {
     if (req.oidc.isAuthenticated()) {
         res.redirect('/home');
     } else {
-        res.redirect('/');  // Or some error page
+        res.redirect('/');
+        console.log("Callback nije uspio") // Or some error page
     }
 });
 
