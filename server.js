@@ -6,13 +6,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
-// za deploy
-const externalUrl = process.env.RENDER_EXTERNAL_URL;
-const port = externalUrl ? 80 : process.env.PORT ? parseInt(process.env.PORT) : 3000;
-
 const app = express();
 const PORT = 3000;
 
+// za deploy
+const externalUrl = process.env.RENDER_EXTERNAL_URL;
+const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -105,11 +104,12 @@ app.get('/competitions', async (req, res) => {
     }
 });
 
-/*
-app.listen(PORT, () => {
-  console.log(`Server pokrenut na http://localhost:${PORT}`);
-});*/
 
+app.listen(port, () => {
+  console.log(`Server pokrenut na http://localhost:${port}`);
+});
+
+/*
 if (externalUrl) {
     const hostname = '0.0.0.0';
     app.listen(port, hostname, () => {
@@ -119,4 +119,4 @@ if (externalUrl) {
     app.listen(port, () => {
         console.log(`Server pokrenut na http://localhost:${port}`);
     });
-  }
+  }*/
