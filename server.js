@@ -27,21 +27,10 @@ const config = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET,
-  baseURL: `http://localhost:${port}`,
+  baseURL: externalUrl || `http://localhost:${port}`,
   clientID: process.env.AUTH0_CLIENT_ID,
   issuerBaseURL: 'https://dev-j04mw5yqbhcpa5gb.eu.auth0.com'
 };
-
-if (externalUrl) {
-  const hostname = '0.0.0.0';
-  app.listen(port, hostname, () => {
-      console.log(`Server locally running at http://${hostname}:${port}/ and from outside on ${externalUrl}`);
-  });
-} else {
-  app.listen(port, () => {
-      console.log(`Server pokrenut na http://localhost:${port}`);
-  });
-}
 
 // stvaranje tablica ako ih nema
 const createTables = async () => {
@@ -116,6 +105,18 @@ app.get('/competitions', async (req, res) => {
     }
 });
 
+/*
 app.listen(PORT, () => {
   console.log(`Server pokrenut na http://localhost:${PORT}`);
-});
+});*/
+
+if (externalUrl) {
+    const hostname = '0.0.0.0';
+    app.listen(port, hostname, () => {
+        console.log(`Server locally running at http://${hostname}:${port}/ and from outside on ${externalUrl}`);
+    });
+  } else {
+    app.listen(port, () => {
+        console.log(`Server pokrenut na http://localhost:${port}`);
+    });
+  }
