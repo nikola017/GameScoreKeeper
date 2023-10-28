@@ -2,6 +2,8 @@ const express = require('express');
 const { auth } = require('express-openid-connect');
 const { requiresAuth } = require('express-openid-connect');
 const { Pool } = require('pg');
+const https = require('https');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
@@ -110,7 +112,10 @@ if (externalUrl) {
         console.log(`Server locally running at http://${hostname}:${port}/ and from outside on ${externalUrl}`);
     });
   } else {
-    app.listen(port, () => {
+    https.createServer({
+        key: fs.readFileSync('server.key'),
+        cert: fs.readFileSync('server.cert')
+    }, app).listen(port, () => {
         console.log(`Server pokrenut na http://localhost:${port}`);
     });
   }
