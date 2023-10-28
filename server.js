@@ -1,12 +1,14 @@
+require('dotenv').config();
+
 const express = require('express');
+const path = require('path');
 const { auth } = require('express-openid-connect');
-const { requiresAuth } = require('express-openid-connect');
-const { Pool } = require('pg');
+
 const https = require('https');
 const fs = require('fs');
+const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 
@@ -14,22 +16,27 @@ const app = express();
 const externalUrl = process.env.RENDER_EXTERNAL_URL;
 const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
+if (!process.env.AUTH0_DOMAIN || !process.env.AUTH0_CLIENT_ID || !process.env.AUTH0_SECRET) {
+    console.error('Neke varijable u .env nisu tu.');
+    process.exit(1);
+  }
+
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: 'gamescorekeeper',
-  password: process.env.DB_PASS,
-  port: 5432,
-  ssl: true
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: 'gamescorekeeper',
+    password: process.env.DB_PASS,
+    port: 5432,
+    ssl: true
 });
 
 const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.AUTH0_SECRET,
-  baseURL: externalUrl || `http://localhost:${port}`,
-  clientID: process.env.AUTH0_CLIENT_ID,
-  issuerBaseURL: 'https://dev-j04mw5yqbhcpa5gb.eu.auth0.com'
+    authRequired: false,
+    auth0Logout: true,
+    secret: process.env.AUTH0_SECRET,
+    baseURL: externalUrl || `http://localhost:${port}`,
+    clientID: process.env.AUTH0_CLIENT_ID,
+    issuerBaseURL: 'https://dev-j04mw5yqbhcpa5gb.eu.auth0.com'
 };
 
 // stvaranje tablica ako ih nema
@@ -87,25 +94,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // auth router attaches /login, /logout, and /callback routes to the baseURL
 app.use(auth(config));
 
-// req.isAuthenticated is provided from the auth router
-app.get('/', (req, res) => {
-    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
+// routes
+app.set('view engine', 'ejs');
+app.use('/', require('./routes/index'));
+app.use('/', require('./routes/home'));
 
-app.get('/profile', requiresAuth(), (req, res) => {
-    res.send(JSON.stringify(req.oidc.user));
-});
-
-app.get('/competitions', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT * FROM competitions');
-        res.status(200).json(rows);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+app.get('/callback', (req, res) => {
+    if (req.oidc.isAuthenticated()) {
+        res.redirect('/home');
+    } else {
+        res.redirect('/');  // Or some error page
     }
 });
 
 
+// za deploy
 if (externalUrl) {
     const hostname = '0.0.0.0';
     app.listen(port, hostname, () => {
