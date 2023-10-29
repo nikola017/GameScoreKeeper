@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-const { auth } = require('express-openid-connect');
+const { auth, requiresAuth } = require('express-openid-connect');
 
 const https = require('https');
 const fs = require('fs');
@@ -19,7 +19,7 @@ const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 3000
 if (!process.env.AUTH0_DOMAIN || !process.env.AUTH0_CLIENT_ID || !process.env.AUTH0_SECRET) {
     console.error('Neke varijable u .env nisu tu.');
     process.exit(1);
-  }
+}
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -33,10 +33,15 @@ const pool = new Pool({
 const config = {
     authRequired: false,
     auth0Logout: true,
-    secret: process.env.AUTH0_SECRET,
+    secret: process.env.SECRET,
     baseURL: externalUrl || `http://localhost:${port}`,
     clientID: process.env.AUTH0_CLIENT_ID,
-    issuerBaseURL: 'https://dev-j04mw5yqbhcpa5gb.eu.auth0.com'
+    issuerBaseURL: 'https://dev-j04mw5yqbhcpa5gb.eu.auth0.com',
+    clientSecret:process.env.AUTH0_SECRET,
+    authorizationParams: {
+        response_type: 'code',
+        scope: "openid profile email"
+    }
 };
 
 // stvaranje tablica ako ih nema
@@ -98,17 +103,6 @@ app.use(auth(config));
 app.set('view engine', 'ejs');
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/home'));
-
-/*
-app.get('/callback', (req, res) => {
-    if (req.oidc.isAuthenticated()) {
-        res.redirect('/home');
-    } else {
-        res.redirect('/');
-        console.log("Callback nije uspio") // Or some error page
-    }
-});*/
-
 
 // za deploy
 if (externalUrl) {
