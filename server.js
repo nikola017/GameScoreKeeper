@@ -112,15 +112,17 @@ app.get('/callback', (req, res) => {
 
 // za deploy
 if (externalUrl) {
-    const hostname = '0.0.0.0';
+    const hostname = '0.0.0.0'; // ne 127.0.0.1
     app.listen(port, hostname, () => {
         console.log(`Server locally running at http://${hostname}:${port}/ and from outside on ${externalUrl}`);
     });
-  } else {
+  }
+  else {
     https.createServer({
         key: fs.readFileSync('server.key'),
         cert: fs.readFileSync('server.cert')
-    }, app).listen(port, () => {
-        console.log(`Server pokrenut na http://localhost:${port}`);
+    }, app)
+    .listen(port, () => {
+        console.log(`Server running at https://localhost:${port}/`);
     });
   }
