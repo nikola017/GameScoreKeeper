@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     if (req.oidc.isAuthenticated()) {
         res.redirect('/home');
     } else {
