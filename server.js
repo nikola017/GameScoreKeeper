@@ -99,6 +99,7 @@ app.set('view engine', 'ejs');
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/home'));
 
+/*
 app.get('/callback', (req, res) => {
     if (req.oidc.isAuthenticated()) {
         res.redirect('/home');
@@ -106,7 +107,7 @@ app.get('/callback', (req, res) => {
         res.redirect('/');
         console.log("Callback nije uspio") // Or some error page
     }
-});
+});*/
 
 
 // za deploy

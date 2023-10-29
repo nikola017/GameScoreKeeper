@@ -1,16 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('index');
-});
-
-router.get('/home', (req, res) => {
+app.get('/', (req, res) => {
     if (req.oidc.isAuthenticated()) {
-        res.render('home');  // Ako je korisnik autenticiran, prikažite mu home stranicu.
+        res.redirect('/home');
     } else {
-        res.redirect('/');  // Ako korisnik nije autenticiran, preusmjerite ga natrag na glavnu stranicu.
+        res.render('index');
     }
-});
+  });
 
 module.exports = router;
