@@ -68,9 +68,17 @@ router.post('/createTournament', async (req, res) => {
             SELECT id, name FROM Tournaments
         `);
 
-        // error ako je nije dobar broj korisnika
+        // error ako je nije dobar broj natjecatelja te da li je svaki natjecatelj jedinstven
         const { tournamentName, competitors, scoringSystem } = req.body;
         const competitorNames = competitors.split(/\s*[,;\n]+\s*/);
+        if (competitorNames.length !== new Set(competitorNames).size) {
+            return res.render('home', {
+                username,
+                errorMessage: 'Svaki natjecatelj mora biti jedinstven.',
+                tournaments: userTournaments.rows, 
+                allTournaments: allTournaments.rows
+            });
+        }
         if (competitorNames.length < 4 || competitorNames.length > 8) {
             return res.render('home', {
                 username,
