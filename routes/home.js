@@ -205,6 +205,16 @@ router.post('/submitResults', requiresAuth(), async (req, res) => {
         }
     }
 
+    // Resetiranje bodova natjecatelja
+    const tournamentIds = new Set();  // skup za spremanje svih turnira koji su ažurirani
+    for (const resultId of Object.keys(resultUpdates)) {
+        const tournamentIdQuery = await pool.query(`SELECT tournament_id FROM Results WHERE id = $1`, [resultId]);
+        tournamentIds.add(tournamentIdQuery.rows[0].tournament_id);
+    }
+    for (const tournamentId of tournamentIds) {
+        await pool.query(`UPDATE Competitors SET total_points = 0 WHERE tournament_id = $1`, [tournamentId]);
+    }
+
     for (const [resultId, scores] of Object.entries(resultUpdates)) {
         await pool.query(`UPDATE Results SET score1 = $1, score2 = $2 WHERE id = $3`, [scores.score1, scores.score2, resultId]);
         

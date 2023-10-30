@@ -4,7 +4,7 @@
   <title>Game Score Keeper: Home Page</title>
 </head>
 <body>
-  <h1>Welcome, <%= username %></h1>
+  <h1>Dobrodošli, <%= username %></h1>
   <% if (errorMessage) { %>
     <p style="color:red"><%= errorMessage %></p>
   <% } %>
@@ -21,7 +21,7 @@
     <input type="submit" value="Kreiraj natjecanje">
   </form>
 
-  <h2>Your Tournaments:</h2>
+  <h2>Tvoja natjecanja:</h2>
   <div id="tournamentList">
     <% tournaments.forEach(function(tournament) { %>
       <div class="tournamentItem">
@@ -32,7 +32,7 @@
     <% }) %>
   </div>
   <br></br>
-  <h2>All Tournaments:</h2>
+  <h2>Sva natjecanja:</h2>
   <div id="allTournamentList">
     <% allTournaments.forEach(function(tournament) { %>
       <div class="tournamentItem">
@@ -41,7 +41,7 @@
     <% }) %>
   </div>
   <br><br>
-  <a href="/profile">Profile</a>
-  <a href="/logout">Logout</a>
+  <a href="/profile">Profil</a>
+  <a href="/logout">Odjavi se</a>
 </body>
 </html>

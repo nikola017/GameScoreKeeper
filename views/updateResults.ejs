@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Update Results</title>
+  <title>Game Score Keeper: Update Results</title>
 </head>
 <body>
-  <h1>Update Results</h1>
+  <h1>Ažuiraj rezultate:</h1>
   <form action="/submitResults" method="POST">
     <% results.forEach(result => { %>
       <div>
@@ -13,7 +13,7 @@
         <label><%= result.competitor1_name %> vs <%= result.competitor2_name %></label>
       </div>
     <% }) %>
-    <button type="submit">Submit</button>
+    <button type="submit">Potvrdi promjene</button>
   </form>
 </body>
 <script>
