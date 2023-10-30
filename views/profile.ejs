@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    .verified {
+      color: green;
+    }
+    .not-verified {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Your Profile</h1>
+  
+  <h2>User Details:</h2>
+  
+  <p><strong>Nickname:</strong> <%= userProfile.nickname %></p>
+  <p><strong>Name:</strong> <%= userProfile.name %></p>
+  <img src="<%= userProfile.picture %>" alt="User Picture">
+  <p><strong>Email:</strong> <%= userProfile.email %></p>
+
+  <% if (!userProfile.email_verified) { %>
+    <p class="not-verified">Email is not verified</p>
+  <% } %>
+  
+  <a href="/">Home</a> | <a href="/logout">Logout</a>
+</body>
+</html>

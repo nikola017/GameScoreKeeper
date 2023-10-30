@@ -5,5 +5,33 @@
 </head>
 <body>
   <h1>Welcome, <%= username %></h1>
+  <% if (errorMessage) { %>
+    <p style="color:red"><%= errorMessage %></p>
+  <% } %>
+  <form action="/createTournament" method="POST">
+    <label for="tournamentName">Naziv natjecanja:</label>
+    <input type="text" id="tournamentName" name="tournamentName" required>
+  
+    <label for="competitors">Natjecatelji (odvojeni točkom, zarezom ili novim redom):</label>
+    <textarea id="competitors" name="competitors" required></textarea>
+  
+    <label for="scoringSystem">Sustav bodovanja (pobjeda/remi/poraz):</label>
+    <input type="text" id="scoringSystem" name="scoringSystem" required>
+  
+    <input type="submit" value="Kreiraj natjecanje">
+    <h2>Your Tournaments:</h2>
+    <div id="tournamentList">
+      <% tournaments.forEach(function(tournament) { %>
+        <div class="tournamentItem">
+        <a href="/updateResults/<%= tournament.id %>"><%= tournament.name %></a>
+      </div>
+      <% }) %>
+    </div>
+  </form>
+  <h2></h2>
+  <h2>Moja natjecanja</h2>
+  <br></br>
+  <a href="/profile">Edit Profile</a>
+  <a href="/logout">Logout</a>
 </body>
 </html>

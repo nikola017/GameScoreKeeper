@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Results</title>
+</head>
+<body>
+  <h1>Update Results</h1>
+  <form action="/submitResults" method="POST">
+    <% results.forEach(result => { %>
+      <div>
+        <input type="text" name="score1_<%= result.id %>" value="<%= result.score1 %>">
+        <input type="text" name="score2_<%= result.id %>" value="<%= result.score2 %>">
+        <label><%= result.competitor1_name %> vs <%= result.competitor2_name %></label>
+      </div>
+    <% }) %>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
