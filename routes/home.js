@@ -28,12 +28,23 @@ router.get('/home', async (req, res) => {
         }
 
         // Dohvaćanje turnira koje je kreirao trenutni korisnik
-        const tournaments = await pool.query(`
+        const userTournaments = await pool.query(`
             SELECT id, name FROM Tournaments WHERE created_by = $1
         `, [req.oidc.user.sub]);
-        res.render('home', { username, errorMessage: null, tournaments: tournaments.rows });  // Ako je korisnik autenticiran, prikažite mu home stranicu.
+
+        // Dohvaćanje svih turnira
+        const allTournaments = await pool.query(`
+            SELECT id, name FROM Tournaments
+        `);
+
+        res.render('home', { 
+            username, 
+            errorMessage: null, 
+            tournaments: userTournaments.rows, 
+            allTournaments: allTournaments.rows 
+        });  
     } else {
-        res.redirect('/');  // Ako korisnik nije autenticiran, preusmjerite ga natrag na glavnu stranicu.
+        res.redirect('/');  
     }
 });
 

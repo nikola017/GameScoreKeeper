@@ -31,9 +31,17 @@
       </div>
     <% }) %>
   </div>
-  
+  <br></br>
+  <h2>All Tournaments:</h2>
+  <div id="allTournamentList">
+    <% allTournaments.forEach(function(tournament) { %>
+      <div class="tournamentItem">
+        <a href="/tournamentDetails/<%= tournament.id %>"><%= tournament.name %></a>
+      </div>
+    <% }) %>
+  </div>
   <br><br>
-  <a href="/profile">Edit Profile</a>
+  <a href="/profile">Profile</a>
   <a href="/logout">Logout</a>
 </body>
 </html>
