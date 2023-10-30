@@ -29,12 +29,6 @@
     </div>
   </form>
   <h2></h2>
-  <h2>Moja natjecanja</h2>
-  <ul>
-    <% tournaments.forEach(tournament => { %>
-    <li><a href="/schedule/<%= tournament.id %>"><%= tournament.name %></a></li>
-    <% }) %>
-  </ul>
   <br></br>
   <a href="/profile">Edit Profile</a>
   <a href="/logout">Logout</a>
