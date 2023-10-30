@@ -101,8 +101,17 @@ router.post('/createTournament', async (req, res) => {
             `, [tournamentId]);
         
             const competitorIds = competitorsResult.rows.map(row => row.id);
-            let roundNumber = 1;
-  
+            
+            // Ovdje generiramo raspored; za sada pretpostavimo da svaki natjecatelj igra s svakim
+            for (let i = 0; i < competitorIds.length; i++) {
+                for (let j = i + 1; j < competitorIds.length; j++) {
+                    await pool.query(`
+                        INSERT INTO Results (round, competitor1_id, competitor2_id, tournament_id)
+                        VALUES ($1, $2, $3, $4)
+                    `, [roundNumber, competitorIds[i], competitorIds[j], tournamentId]);
+                    }
+            }
+
             res.redirect('/home');
         } catch (error) {
         console.error('Greška prilikom kreiranja turnira:', error);
@@ -149,16 +158,5 @@ router.post('/submitResults', async (req, res) => {
     
     res.redirect('/home');
 });
-
-/*
-router.get('/schedule/:tournamentId', async (req, res) => {
-    const tournamentId = req.params.tournamentId;
-    // Ovdje dohvatite raspored iz baze podataka koristeći tournamentId
-    //const schedule = await; 
-
-    res.render('schedule', { schedule });
-});
-*/
-
 
 module.exports = router;
