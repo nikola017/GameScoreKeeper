@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= tournament.name %></title>
+</head>
+<body>
+  <h1><%= tournament.name %></h1>
+  
+  <!-- Raspored -->
+  <h2>Raspored</h2>
+  <ul>
+    <% results.forEach(result => { %>
+      <li>
+        <%= result.competitor1_name %> vs <%= result.competitor2_name %>
+        : <%= result.score1 %> - <%= result.score2 %>
+      </li>
+    <% }) %>
+  </ul>
+  
+  <!-- Ljestvica -->
+  <h2>Ljestvica</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Natjecatelj</th>
+        <th>Bodovi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% competitors.forEach(competitor => { %>
+        <tr>
+          <td><%= competitor.name %></td>
+          <td><%= competitor.total_points %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+</body>
+</html>

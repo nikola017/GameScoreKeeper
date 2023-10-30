@@ -19,17 +19,20 @@
     <input type="text" id="scoringSystem" name="scoringSystem" required>
   
     <input type="submit" value="Kreiraj natjecanje">
-    <h2>Your Tournaments:</h2>
-    <div id="tournamentList">
-      <% tournaments.forEach(function(tournament) { %>
-        <div class="tournamentItem">
-        <a href="/updateResults/<%= tournament.id %>"><%= tournament.name %></a>
-      </div>
-      <% }) %>
-    </div>
   </form>
-  <h2></h2>
-  <br></br>
+
+  <h2>Your Tournaments:</h2>
+  <div id="tournamentList">
+    <% tournaments.forEach(function(tournament) { %>
+      <div class="tournamentItem">
+        <a href="/updateResults/<%= tournament.id %>">Ažuriranje rezultata: <%= tournament.name %></a>
+        | <!-- Ovaj simbol | služi kao vizualni razdjelnik između poveznica -->
+        <a href="/tournamentDetails/<%= tournament.id %>">Detalji turnira: <%= tournament.name %></a>
+      </div>
+    <% }) %>
+  </div>
+  
+  <br><br>
   <a href="/profile">Edit Profile</a>
   <a href="/logout">Logout</a>
 </body>
