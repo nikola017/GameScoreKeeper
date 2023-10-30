@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
 const { Pool } = require('pg');
+const { requiresAuth } = require('express-openid-connect');
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -14,7 +15,7 @@ const pool = new Pool({
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
-const tournamentLink = uuid.v4(); // Generira jedinstveni UUID
+const tournamentLink = uuid.v4();
 
 router.get('/home', async (req, res) => {
     if (req.oidc.isAuthenticated()) {
@@ -31,7 +32,6 @@ router.get('/home', async (req, res) => {
         const userTournaments = await pool.query(`
             SELECT id, name FROM Tournaments WHERE created_by = $1
         `, [req.oidc.user.sub]);
-
         // Dohvaćanje svih turnira
         const allTournaments = await pool.query(`
             SELECT id, name FROM Tournaments
@@ -41,7 +41,7 @@ router.get('/home', async (req, res) => {
             username, 
             errorMessage: null, 
             tournaments: userTournaments.rows, 
-            allTournaments: allTournaments.rows 
+            allTournaments: allTournaments.rows
         });  
     } else {
         res.redirect('/');  
@@ -50,7 +50,6 @@ router.get('/home', async (req, res) => {
 
 router.post('/createTournament', async (req, res) => {
     if (req.oidc.isAuthenticated()) {
-        const { tournamentName, competitors, scoringSystem } = req.body;
         const createdBy = req.oidc.user.sub;
         let username;
         if (req.oidc && req.oidc.user) {
@@ -60,7 +59,37 @@ router.post('/createTournament', async (req, res) => {
                 username = req.oidc.user.sub;
             }
         }
+        // Dohvaćanje turnira koje je kreirao trenutni korisnik
+        const userTournaments = await pool.query(`
+            SELECT id, name FROM Tournaments WHERE created_by = $1
+        `, [req.oidc.user.sub]);
+        // Dohvaćanje svih turnira
+        const allTournaments = await pool.query(`
+            SELECT id, name FROM Tournaments
+        `);
 
+        // error ako je nije dobar broj korisnika
+        const { tournamentName, competitors, scoringSystem } = req.body;
+        const competitorNames = competitors.split(/\s*[,;\n]+\s*/);
+        if (competitorNames.length < 4 || competitorNames.length > 8) {
+            return res.render('home', {
+                username,
+                errorMessage: 'Broj natjecatelja mora biti između 4 i 8.',
+                tournaments: userTournaments.rows, 
+                allTournaments: allTournaments.rows
+            });
+        }
+        // error ako sustav bodovanja nije dobro definiran
+        const validScoringSystemFormat = /^(\d+)\/(\d+)\/(\d+)$/.test(scoringSystem);
+        if (!validScoringSystemFormat) {
+            return res.render('home', {
+                username,
+                errorMessage: 'Sustav bodovanja mora biti u formatu "broj/broj/broj".',
+                tournaments: userTournaments.rows, 
+                allTournaments: allTournaments.rows
+            });
+        }
+        
         // Provjera je li isti turnir već postoji
         const existingTournament = await pool.query(`
             SELECT id FROM Tournaments WHERE name = $1 LIMIT 1
@@ -153,17 +182,21 @@ router.get('/updateResults/:tournamentId', async (req, res) => {
 });
 
 
-router.post('/submitResults', async (req, res) => {
-    // Provjera autentikacije i ovlasti
-    // ...
-    
+router.post('/submitResults', requiresAuth(), async (req, res) => {    
     const resultUpdates = Object.keys(req.body).reduce((acc, key) => {
         const [prefix, resultId] = key.split('_');
         if (!acc[resultId]) acc[resultId] = {};
         acc[resultId][prefix] = req.body[key];
         return acc;
     }, {});
-    
+
+    // Dodana validacija rezultata
+    for (const scores of Object.values(resultUpdates)) {
+        if (isNaN(scores.score1) || scores.score1.trim() === "" || isNaN(scores.score2) || scores.score2.trim() === "") {
+            return res.status(400).send('Molimo unesite ispravne brojeve za rezultate i osigurajte se da polja nisu prazna.');
+        }
+    }
+
     for (const [resultId, scores] of Object.entries(resultUpdates)) {
         await pool.query(`UPDATE Results SET score1 = $1, score2 = $2 WHERE id = $3`, [scores.score1, scores.score2, resultId]);
         
