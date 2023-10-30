@@ -134,7 +134,7 @@ const createTables = async () => {
         `);
         console.log('Tablica "TournamentCompetitors" uspješno ažurirana!');
         
-        await displayAllTables();
+        //await displayAllTables();
   
     } catch (error) {
         console.error('Greška prilikom ažuriranja tablica:', error);

@@ -109,7 +109,7 @@ router.post('/createTournament', async (req, res) => {
             const tournamentId = tournamentResult.rows[0].id;
   
             // Dodavanje natjecatelja u tablicu Competitors
-            const competitorNames = competitors.split(/\s*[,;\n]+\s*/);  // Razdvajamo po točki, zarezu ili novom retku
+            const competitorNames = competitors.split(/\s*[,;\n]+\s*/);
             for (const name of competitorNames) {
                 let existingCompetitor = await pool.query(`
                     SELECT id FROM Competitors WHERE name = $1 LIMIT 1
@@ -143,7 +143,7 @@ router.post('/createTournament', async (req, res) => {
             const competitorIds = competitorsResult.rows.map(row => row.id);
 
             let roundNumber=1
-            // Ovdje generiramo raspored; za sada pretpostavimo da svaki natjecatelj igra s svakim
+            // Generiranje rasporeda
             for (let i = 0; i < competitorIds.length; i++) {
                 for (let j = i + 1; j < competitorIds.length; j++) {
                     await pool.query(`
@@ -200,7 +200,7 @@ router.post('/submitResults', requiresAuth(), async (req, res) => {
     for (const [resultId, scores] of Object.entries(resultUpdates)) {
         await pool.query(`UPDATE Results SET score1 = $1, score2 = $2 WHERE id = $3`, [scores.score1, scores.score2, resultId]);
         
-        // Fetch scoring system
+        // Dohvačanje sustava bodovanja
         const tournamentIdQuery = await pool.query(`SELECT tournament_id FROM Results WHERE id = $1`, [resultId]);
         const tournamentId = tournamentIdQuery.rows[0].tournament_id;
         const scoringSystemQuery = await pool.query(`SELECT scoring_system FROM Tournaments WHERE id = $1`, [tournamentId]);
@@ -226,12 +226,10 @@ router.post('/submitResults', requiresAuth(), async (req, res) => {
     res.redirect('/home');
 });
 
-
-
 router.get('/tournamentDetails/:tournamentId', async (req, res) => {
     const { tournamentId } = req.params;
 
-    // Dohvati turnir po ID-u
+    // Dohvati turnir po id-u
     const tournament = await pool.query(`SELECT * FROM Tournaments WHERE id = $1`, [tournamentId]);
 
     // Dohvati rezultate za turnir
@@ -254,6 +252,5 @@ router.get('/tournamentDetails/:tournamentId', async (req, res) => {
         competitors: competitors.rows 
     });
 });
-
 
 module.exports = router;
